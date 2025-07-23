@@ -24,3 +24,10 @@ export async function cancelAppointment(appointmentId: number) {
   });
   return res.json();
 }
+
+export async function fetchAppointmentsByEmail(email: string) {
+  const res = await fetch(`${API_BASE}/appointments/${email}`, {
+    cache: "no-store",
+  });
+  return res.json();
+}
