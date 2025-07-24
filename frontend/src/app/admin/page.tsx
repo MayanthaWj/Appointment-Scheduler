@@ -11,6 +11,7 @@ import {
 } from "../lib/api";
 import AddSlotModal from "../components/AddSlotModal";
 import EditSlotModal from "../components/EditSlotModal";
+import { useRouter } from "next/navigation";
 
 interface AdminSlot {
   id: number;
@@ -35,7 +36,8 @@ export default function AdminPage() {
   const [isEditSlotModalOpen, setIsEditSlotModalOpen] = useState(false);
   const [editingSlot, setEditingSlot] = useState<AdminSlot | null>(null);
   const [deletingSlotId, setDeletingSlotId] = useState<number | null>(null);
-
+  const router = useRouter();
+  
   // Check for existing token 
   useEffect(() => {
     const savedToken = localStorage.getItem("adminToken");
@@ -85,6 +87,7 @@ export default function AdminPage() {
     setToken(null);
     localStorage.removeItem("adminToken");
     setSlots([]);
+    router.push("/");
   };
 
   const handleCancelAppointment = async (appointmentId: number) => {
