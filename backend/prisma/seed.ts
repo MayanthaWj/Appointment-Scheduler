@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt';
 const prisma = new PrismaClient();
 
 async function main() {
+  // Create Admin User
   const adminPassword = await bcrypt.hash('admin123', 10);
   await prisma.user.upsert({
     where: { email: 'admin@example.com' },
@@ -15,16 +16,19 @@ async function main() {
     },
   });
 
+  // Create Appointment Slots for Next 3 Days 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  for (let d = 0; d < 7; d++) {
+  for (let d = 1; d <= 3; d++) {  
     const date = new Date(today);
     date.setDate(today.getDate() + d);
 
-    for (let hour = 8; hour < 18; hour += 2) {
+    for (let hour = 8; hour <= 16; hour += 2) {  
       const slot = new Date(date);
       slot.setHours(hour);
+      slot.setMinutes(0, 0, 0);
+
       await prisma.appointmentSlot.upsert({
         where: { dateTime: slot },
         update: {},
@@ -32,6 +36,13 @@ async function main() {
       });
     }
   }
+
+  console.log('✅ Seed data created: Admin user and slots for next 3 days');
 }
 
-main().catch(console.error).finally(() => prisma.$disconnect());
+main()
+  .catch((err) => {
+    console.error(err);
+    process.exit(1);
+  })
+  .finally(() => prisma.$disconnect());

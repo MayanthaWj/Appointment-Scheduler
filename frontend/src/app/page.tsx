@@ -5,6 +5,7 @@ import SlotCard from "./components/Slotcard";
 import Modal from "./components/Modal";
 import AppointmentForm from "./components/AppointmentForm";
 import BookingDetailsModal from "./components/BookingDeatailsModal";
+import Link from "next/link";
 
 type Slot = {
   id: number;
@@ -18,15 +19,22 @@ export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedBookedSlot, setSelectedBookedSlot] = useState<Slot | null>(null);
   const [isBookingDetailsModalOpen, setIsBookingDetailsModalOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
 
   const fetchSlotsFunction = async () => {
+    setError(null);
+    setLoading(true);
     try {
       const data = await fetchSlots();
-      console.log(data);
       setSlots(data);
     } catch (error) {
       console.error("Error fetching slots:", error);
-    }
+      setError("Failed to load slots. Please try again later.");
+    } finally {
+    setLoading(false);
+  }
   };
 
   useEffect(() => {
@@ -75,18 +83,18 @@ export default function Home() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
-          <a
+          <Link
             href="/my-appointments"
             className="px-4 py-2 bg-white text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition-colors"
           >
             My Appointments
-          </a>
-          <a
+          </Link>
+          <Link
             href="/admin"
             className="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
           >
             Admin Login
-          </a>
+          </Link>
         </div>
 
         {/* Title & Subtitle */}
@@ -159,6 +167,13 @@ export default function Home() {
           </div>
         </div>
 
+        {/*If error occured while fetch slots */}
+        {error && (
+          <div className="text-center text-red-600 font-medium mb-6">
+            {error}
+          </div>
+        )}
+
         {/* Available Slots Section */}
         {availableSlots.length > 0 && (
           <div className="mb-8">
@@ -201,7 +216,7 @@ export default function Home() {
         )}
 
         {/* Loading State */}
-        {slots.length === 0 && (
+        {loading && (
           <div className="text-center py-16">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
             <p className="text-gray-500 text-lg">
